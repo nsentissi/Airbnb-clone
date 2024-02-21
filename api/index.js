@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User.js");
 const cookieParser = require("cookie-parser");
+const download = require("image-downloader")
 require("dotenv").config();
 const app = express();
 
@@ -13,6 +14,7 @@ const jwtSecret = "nkjnkj433kljdfewj53khnl";
 
 app.use(express.json());
 app.use(cookieParser());
+app.use('/uploads', express.static(__dirname+'/uploads'))
 app.use(
   cors({
     credentials: true,
@@ -81,5 +83,26 @@ app.post("/logout", (req,res) => {
     
     res.cookie('token', '').json(true)
 })
+
+
+
+app.post('/upload-by-link', async (req, res) => {
+    const { link } = req.body;
+    if (!link.startsWith('http://') && !link.startsWith('https://')) {
+        return res.status(400).json({ error: 'Invalid URL provided' });
+    }
+
+    const newName = 'photo' + Date.now() + '.jpg';
+    try {
+        await download.image({
+            url: link,
+            dest: __dirname + '/uploads/' + newName,
+        });
+        res.json(newName);
+    } catch (error) {
+        console.error('Error downloading image:', error);
+        res.status(500).json({ error: 'Failed to download image' });
+    }
+});
 
 app.listen(3000);
