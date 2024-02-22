@@ -4,11 +4,12 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User.js");
+const Place = require("./models/Place.js");
 const cookieParser = require("cookie-parser");
 const download = require("image-downloader");
 const multer = require("multer");
-const path = require('path');
-const fs = require ('fs')
+const path = require("path");
+const fs = require("fs");
 
 require("dotenv").config();
 const app = express();
@@ -106,19 +107,49 @@ app.post("/upload-by-link", async (req, res) => {
   }
 });
 
-const photosMiddleware = multer({dest:'uploads/'})
-app.post("/upload",photosMiddleware.array('photos', 100), (req, res) => {
-    const uploadedFiles = []
-    for (let i = 0 ; i < req.files.length; i++ ) {
-        const {path: filePath, originalname} = req.files[i];
-        const parts = originalname.split('.');
-        const ext = parts.pop();
-        const newPath = `${filePath}.${ext}`;
-        fs.renameSync(filePath, newPath);
-        const relativePath = path.relative(__dirname + '/uploads', newPath);
-        uploadedFiles.push(relativePath);
-    }
-    res.json(uploadedFiles);
+const photosMiddleware = multer({ dest: "uploads/" });
+app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
+  const uploadedFiles = [];
+  for (let i = 0; i < req.files.length; i++) {
+    const { path: filePath, originalname } = req.files[i];
+    const parts = originalname.split(".");
+    const ext = parts.pop();
+    const newPath = `${filePath}.${ext}`;
+    fs.renameSync(filePath, newPath);
+    const relativePath = path.relative(__dirname + "/uploads", newPath);
+    uploadedFiles.push(relativePath);
+  }
+  res.json(uploadedFiles);
+});
+
+app.post("/places", (req, res) => {
+  const { token } = req.cookies;
+  const {
+    title,
+    address,
+    addedPhotos,
+    description,
+    perks,
+    extraInfo,
+    checkIn,
+    checkOut,
+    maxGuests,
+  } = req.body;
+  jwt.verify(token, jwtSecret, {}, async (err, user) => {
+    if (err) throw err;
+    const placeDoc = await Place.create({
+      owner: user.id,
+      address,
+      addedPhotos,
+      description,
+      perks,
+      extraInfo,
+      checkIn,
+      checkOut,
+      maxGuests,
+    });
+    res.json(placeDoc);
+  });
 });
 
 app.listen(3000);
