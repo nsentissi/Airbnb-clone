@@ -16,14 +16,34 @@ const PlacesPage = () => {
   const [checkOut, setCheckOut] = useState("");
   const [maxGuest, setMaxGuests] = useState(1);
 
-  const  addPhotoByLink = async (e) => {
+  const addPhotoByLink = async (e) => {
     e.preventDefault();
-   const {data:filename} = await axios.post ('/upload-by-link', {link: photoLink })
-    setaddedPhotos(prev => {
-        return [...prev, filename]
-    })
-    setPhotoLink('')
-  }
+    const { data: filename } = await axios.post("/upload-by-link", {
+      link: photoLink,
+    });
+    setaddedPhotos((prev) => {
+      return [...prev, filename];
+    });
+    setPhotoLink("");
+  };
+
+  const uploadphoto = (e) => {
+    const files = e.target.files;
+    const data = new FormData();
+    for (let i = 0 ; i < files.length; i++ ) {
+        data.append('photos', files[i])
+    }
+    axios
+      .post("/upload", data, {
+        headers: {"Content-type": "multipart/form-data" },
+      })
+      .then((response) => {
+        const { data: filenames } = response;
+        setaddedPhotos((prev) => {
+          return [...prev, ...filenames];
+        });
+      });
+  };
 
   return (
     <div>
@@ -80,15 +100,25 @@ const PlacesPage = () => {
                 }}
                 placeholder="add photo using a link"
               />
-              <button onClick={addPhotoByLink} className="bg-gray-200 px-4 rounded-2xl py-2 ">
+              <button
+                onClick={addPhotoByLink}
+                className="bg-gray-200 px-4 rounded-2xl py-2 "
+              >
                 Add photo
               </button>
             </div>
-            <div className="mt-2 gap-4 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                {addedPhotos.length > 0 && addedPhotos.map(link =>(
-                    <img className="h-36 rounded-2xl" src={'http://localhost:3000/uploads/'+link}  />
-                )) }
-              <button className=" flex items-center justify-center gap-2 border bg-transparent rounded-2xl p-2 text-2xl text-gray-600">
+            <div className="mt-2 gap-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+              {addedPhotos.length > 0 &&
+                addedPhotos.map((link) => (
+                    <div className="h-32 flex">
+                  <img
+                    className="rounded-2xl w-full object-cover position-center"
+                    src={"http://localhost:3000/uploads/" + link}
+                  />
+                  </div>
+                ))}
+              <label className=" h-32 cursor-pointer flex items-center justify-center gap-2 border bg-transparent rounded-2xl p-2 text-2xl text-gray-600">
+                <input type="file" multiple className="hidden" onChange={uploadphoto} />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -104,7 +134,7 @@ const PlacesPage = () => {
                   />
                 </svg>
                 Upload from your device
-              </button>
+              </label>
             </div>
             <h2 className="text-2xl mt-4">Description</h2>
             <textarea
