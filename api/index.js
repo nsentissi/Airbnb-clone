@@ -139,6 +139,7 @@ app.post("/places", (req, res) => {
     if (err) throw err;
     const placeDoc = await Place.create({
       owner: user.id,
+      title,
       address,
       addedPhotos,
       description,
