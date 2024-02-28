@@ -9,7 +9,7 @@ const IndexPage = () => {
     axios.get("/places").then((response) => {
       setplaces(response.data);
     });
-  });
+  }, []);
 
   return (
     <div className=" mt-24 grid gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
