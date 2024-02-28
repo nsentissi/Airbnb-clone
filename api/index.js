@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User.js");
 const Place = require("./models/Place.js");
+const Booking = require("./models/Booking.js");
 const cookieParser = require("cookie-parser");
 const download = require("image-downloader");
 const multer = require("multer");
@@ -28,6 +29,15 @@ app.use(
 );
 
 mongoose.connect(process.env.MONGO_URL);
+
+function getUserDataFromReq(req) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(req.cookies.token, jwtSecret, {}, async (err, user) => {
+      if (err) throw err;
+      resolve(user)
+    });
+  });
+}
 
 app.get("/test", (req, res) => {
   res.json("test ok");
@@ -134,6 +144,7 @@ app.post("/places", (req, res) => {
     checkIn,
     checkOut,
     maxGuests,
+    price,
   } = req.body;
   jwt.verify(token, jwtSecret, {}, async (err, user) => {
     if (err) throw err;
@@ -148,12 +159,13 @@ app.post("/places", (req, res) => {
       checkIn,
       checkOut,
       maxGuests,
+      price,
     });
     res.json(placeDoc);
   });
 });
 
-app.get("/places", (req, res) => {
+app.get("/user-places", (req, res) => {
   const { token } = req.cookies;
 
   jwt.verify(token, jwtSecret, {}, async (err, user) => {
@@ -181,6 +193,7 @@ app.put("/places", async (req, res) => {
     checkIn,
     checkOut,
     maxGuests,
+    price,
   } = req.body;
 
   jwt.verify(token, jwtSecret, {}, async (err, user) => {
@@ -197,11 +210,40 @@ app.put("/places", async (req, res) => {
         checkIn,
         checkOut,
         maxGuests,
+        price,
       });
-     await placeDoc.save();
-      res.json('info updated')
+      await placeDoc.save();
+      res.json("info updated");
     }
   });
+});
+
+app.get("/places", async (req, res) => {
+  res.json(await Place.find());
+});
+
+app.post("/bookings", async (req, res) => {
+  const userData = await getUserDataFromReq(req)
+  const { place, checkIn, checkOut, numberOfGuests, name, mobile, price } =
+    req.body;
+  const bookingDoc = await Booking.create({
+    place,
+    checkIn,
+    checkOut,
+    numberOfGuests,
+    name,
+    mobile,
+    price,
+    user: userData.id
+  });
+  res.json(bookingDoc);
+});
+
+
+
+app.get("/bookings", async (req, res) => {
+ const userData = await getUserDataFromReq(req);
+ res.json( await Booking.find({user: userData.id}).populate('place'))
 });
 
 app.listen(3000);
