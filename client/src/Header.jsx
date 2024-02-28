@@ -49,7 +49,7 @@ const Header = () => {
           </button>
         </div>
         <Link
-          to={user ? "/account" : "/login"}
+          to={user ? "/account/profile" : "/login"}
           className="flex items-center gap-2 border border-gray-300 rounded-full p-2 px-4"
         >
           <svg
