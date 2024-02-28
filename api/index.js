@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User.js");
 const Place = require("./models/Place.js");
+const Booking = require("./models/Booking.js");
 const cookieParser = require("cookie-parser");
 const download = require("image-downloader");
 const multer = require("multer");
@@ -202,15 +203,29 @@ app.put("/places", async (req, res) => {
         maxGuests,
         price,
       });
-     await placeDoc.save();
-      res.json('info updated')
+      await placeDoc.save();
+      res.json("info updated");
     }
   });
 });
 
 app.get("/places", async (req, res) => {
-  
-  res.json(await Place.find())
+  res.json(await Place.find());
+});
+
+app.post("/bookings", async (req, res) => {
+  const { place, checkIn, checkOut, numberOfGuests, name, mobile, price } =
+    req.body;
+ const bookingDoc = await Booking.create({
+    place,
+    checkIn,
+    checkOut,
+    numberOfGuests,
+    name,
+    mobile,
+    price,
+  });
+  res.json(bookingDoc)
 });
 
 app.listen(3000);
