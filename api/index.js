@@ -3,18 +3,14 @@ require("./db.js");
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const Booking = require("./models/Booking.js");
-
-const path = require("path");
 
 
 
-const userRouter = require("./routes/user")
-const placeRouter = require("./routes/place")
+const userRouter = require("./routes/user");
+const placeRouter = require("./routes/place");
+const bookingRouter = require("./routes/booking.js");
 
 const app = express();
-
-
 
 app.use(express.json());
 app.use(cookieParser());
@@ -27,33 +23,8 @@ app.use(
   })
 );
 
-app.use("/api/auth", userRouter)
-app.use("/api/rentals", placeRouter)
-
-
-
-app.post("/bookings", async (req, res) => {
-  const userData = await getUserDataFromReq(req)
-  const { place, checkIn, checkOut, numberOfGuests, name, mobile, price } =
-    req.body;
-  const bookingDoc = await Booking.create({
-    place,
-    checkIn,
-    checkOut,
-    numberOfGuests,
-    name,
-    mobile,
-    price,
-    user: userData.id
-  });
-  res.json(bookingDoc);
-});
-
-
-
-app.get("/bookings", async (req, res) => {
- const userData = await getUserDataFromReq(req);
- res.json( await Booking.find({user: userData.id}).populate('place'))
-});
+app.use("/api/auth", userRouter);
+app.use("/api/rentals", placeRouter);
+app.use("/api/book", bookingRouter);
 
 app.listen(3000);
