@@ -9,7 +9,7 @@ import BookingInfo from "../BookingInfo";
 const BookingsPage = () => {
   const [bookings, setBookings] = useState([]);
   useEffect(() => {
-    axios.get("/bookings").then((response) => {
+    axios.get("/api/book/bookings").then((response) => {
       setBookings(response.data);
     });
   }, []);
