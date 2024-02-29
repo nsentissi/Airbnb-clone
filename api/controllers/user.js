@@ -49,6 +49,7 @@ const login = async (req, res) => {
           maxAge: 24 * 60 * 60 * 1000,
         });
         res.json({ success: true });
+        console.log(user)
       }
     );
   } catch (error) {
@@ -59,7 +60,7 @@ const login = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
-    const { name, email, _id } = req.user;
+    const { name, email, _id } = req.user
     res.json({ name, email, _id });
   } catch (error) {
     console.error("Error fetching profile:", error);

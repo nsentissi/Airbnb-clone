@@ -14,6 +14,7 @@ const AccountPage = () => {
     await axios.post("/api/auth/logout",{ withCredentials: true });
     setRedirect("/");
     setUser(null);
+  
   };
 
   if (!loading) {

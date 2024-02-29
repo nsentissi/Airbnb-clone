@@ -12,9 +12,10 @@ const verifyToken = async (req, res, next) => {
     const user = await jwt.verify(token, process.env.JWT_SECRET);
     req.user = {
       email: user.email,
-      id: user._id,
+      id: user.id,
       name: user.name,
     };
+  
     next();
   } catch (error) {
     console.error("Token Verification Error:", error);
