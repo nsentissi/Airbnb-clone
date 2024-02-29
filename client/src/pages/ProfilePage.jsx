@@ -11,7 +11,7 @@ const AccountPage = () => {
   const { user, loading, setUser } = useContext(UserContext);
 
   const logout = async () => {
-    await axios.post("/logout");
+    await axios.post("/api/auth/logout",{ withCredentials: true });
     setRedirect("/");
     setUser(null);
   };

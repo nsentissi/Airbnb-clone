@@ -1,22 +1,22 @@
+require("dotenv").config();
+require("./db.js");
 const express = require("express");
 const cors = require("cors");
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("./models/User.js");
+const cookieParser = require("cookie-parser");
 const Place = require("./models/Place.js");
 const Booking = require("./models/Booking.js");
-const cookieParser = require("cookie-parser");
 const download = require("image-downloader");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-require("dotenv").config();
+
+const userRouter = require("./routes/user")
+
+
 const app = express();
 
-const bcryptSalt = bcrypt.genSaltSync(10);
-const jwtSecret = "nkjnkj433kljdfewj53khnl";
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -28,75 +28,10 @@ app.use(
   })
 );
 
-mongoose.connect(process.env.MONGO_URL);
+app.use("/api/auth", userRouter)
 
-function getUserDataFromReq(req) {
-  return new Promise((resolve, reject) => {
-    jwt.verify(req.cookies.token, jwtSecret, {}, async (err, user) => {
-      if (err) throw err;
-      resolve(user)
-    });
-  });
-}
 
-app.get("/test", (req, res) => {
-  res.json("test ok");
-});
 
-app.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
-
-  try {
-    const user = await User.create({
-      name,
-      email,
-      password: bcrypt.hashSync(password, bcryptSalt),
-    });
-    res.json(user);
-  } catch (error) {
-    res.status(422).json(error);
-  }
-});
-
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (user) {
-    const passOK = bcrypt.compareSync(password, user.password);
-    if (passOK) {
-      jwt.sign(
-        { email: user.email, id: user._id },
-        jwtSecret,
-        {},
-        (err, token) => {
-          if (err) throw err;
-          res.cookie("token", token).json(user);
-        }
-      );
-    } else {
-      return res.status(422).json("Wrong password");
-    }
-  } else if (!user) {
-    return res.status(404).json("User not found");
-  }
-});
-
-app.get("/profile", (req, res) => {
-  const { token } = req.cookies;
-  if (token) {
-    jwt.verify(token, jwtSecret, {}, async (err, user) => {
-      if (err) throw err;
-      const { name, email, _id } = await User.findById(user.id);
-      res.json({ name, email, _id });
-    });
-  } else {
-    res.json(null);
-  }
-});
-
-app.post("/logout", (req, res) => {
-  res.cookie("token", "").json(true);
-});
 
 app.post("/upload-by-link", async (req, res) => {
   const { link } = req.body;
