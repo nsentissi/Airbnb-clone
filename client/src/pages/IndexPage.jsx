@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useSearch } from "../SearchContext";
 
 const IndexPage = () => {
   const [places, setplaces] = useState("");
+  const { searchTerm } = useSearch();
 
   useEffect(() => {
     axios.get("/api/rentals/places").then((response) => {
       setplaces(response.data);
     });
   }, []);
+
+  const filteredPlaces = places && places.filter(place => place.name?.toLowerCase().includes(searchTerm.toLowerCase()))
 
   return (
     <div className=" mt-24 grid gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

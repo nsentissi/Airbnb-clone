@@ -1,7 +1,6 @@
 import React from "react";
-import pool from '../src/assets/swimming.svg'
-import pet from '../src/assets/pets.svg'
-
+import pet from '../assets/pets.svg'
+import pool from '../assets/swimming.svg'
 
 const Perks = ({ selected, onChange }) => {
 

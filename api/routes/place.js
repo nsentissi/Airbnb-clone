@@ -13,7 +13,7 @@ placeRouter.post("/places", verifyToken, addRental )
 placeRouter.get("/user-places", verifyToken, getUserPlace)
 placeRouter.get("/places/:id", getSinglePlace);
 placeRouter.put("/places", verifyToken , updatePlace);
-placeRouter.get("/places", verifyToken, getAllPlaces);
+placeRouter.get("/places", getAllPlaces);
 
 
 

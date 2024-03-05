@@ -1,9 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "./UserContext";
+import { useSearch } from "./SearchContext";
 
 const Header = () => {
   const { user } = useContext(UserContext);
+  const {setSearchTerm} = useSearch();
+  
   return (
     <div>
       <header className="flex justify-between">
@@ -24,12 +27,14 @@ const Header = () => {
           </svg>
           <span className="font-bold text-xl">airbnb</span>
         </Link>
-        <div className="flex gap-2 border border-gray-300 rounded-full p-2 px-4 shadow-md shadow-gray-300">
-          <div>Anywhere</div>
+        <div className="flex gap-2 border border-gray-300 rounded-full p-2 px-8 shadow-md shadow-gray-300">
+         
+          <input onChange={(e) => setSearchTerm(e.target.value)} className="!w-16" placeholder="Where"></input>
           <div className="border-l border-gray-300"></div>
-          <div>Any week</div>
+          <input className="!w-16" placeholder="When"></input>
           <div className="border-l border-gray-300"></div>
-          <div>Add guests</div>
+          <input className="!w-16" placeholder="Who"></input>
+          
 
           <button className="bg-primary text-white p-1 rounded-full">
             <svg

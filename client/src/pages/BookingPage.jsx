@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios';
-import AddressLink from '../AddressLink';
-import PlaceGallery from '../PlaceGallery';
-import BookingInfo from '../BookingInfo';
+import AddressLink from '../components/AddressLink';
+import PlaceGallery from '../components/PlaceGallery';
+import BookingInfo from '../components/BookingInfo';
 
 const BookingPage = () => {
 
